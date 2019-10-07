@@ -122,7 +122,7 @@ export default {           // つまり、dataの下に記入。
     return {
       todos: [], // todosの中身（一部でも）が変更されれば再レンダリング。
       targetTodo: { // 入力欄との紐づけや、 編集・変更処理の対象となるtodoがここに代入される。
-        id: null, // todosに組み込むまでは虚無。
+        id: null, // todosに組み込むまでは虚無。APIからうけとったJSONのdataから付与される。
         title: '', // 入力欄のバインド対象
         detail: '', // 同上
         completed: false,
@@ -176,12 +176,12 @@ export default {           // つまり、dataの下に記入。
       } else {
         this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
       }
-    },
+    },                                      //  thenは返ってきたpromiseオブジェクト取得後の処理を記入する。
     addTodo() { // Vue.jsにおいては特別な指定がない限り、メソッドの第一引数でそのイベント情報が受け取れるようになっている。
       const postTodo = Object.assign({}, { // 以下で作成したオブジェクトをpostTodoに代入。
         title: this.targetTodo.title, // 入力されたデータをkeyにしてオブジェクト化。
         detail: this.targetTodo.detail,
-      });    // 第一引数：送り先。 第二：リクエストと共に送る情報。     // 引数に分割代入。
+      });    // 第一引数：送り先。 第二：リクエストと共に送る情報。     // 引数に分割代入。 thenはpromise axiosがプロミスを返す。
       axios.post('http://localhost:3000/api/todos/', postTodo).then(({ data }) => { // 取得完了時の処理。postTodoを組み込んでリクエスト送信。
         this.todos.unshift(data); // 新しいリストを上に重ねたいのでdata(状態管理)のtargetTodosにunshift
         this.targetTodo = this.initTargetTodo(); // リスト表示後の入力欄のリセット。targetTodosを新たなtodosに組み込む。
@@ -224,7 +224,7 @@ export default {           // つまり、dataの下に記入。
         return; // returnで、条件を満たさなければ（変化があれば）ここで処理終了。
       }
 
-      axios.patch(`http://localhost:3000/api/todos/${this.targetTodo.id}`, { // 対象のtodoのidを添えて送信
+      axios.patch(`http://localhost:3000/api/todos/${this.targetTodo.id}`, { // 対象のtodoのidを添えて送信 数が入る。
         title: this.targetTodo.title, // 変更内容も送信してそれを上書きさせて取得する。
         detail: this.targetTodo.detail,
       }).then(({ data }) => {
@@ -238,7 +238,7 @@ export default {           // つまり、dataの下に記入。
         this.showError(err);
       });
     }, // editTodo終了
-    deleteTodo(id) { // 「axios」のdeleteメソッドを実行。指定したidのオブジェクトのDELETEリクエストを送る。
+    deleteTodo(id) { // 「axios」のdeleteメソッドを実行。botanタグで引数に指定した対象todoのidを基にDELETEリクエストを送る。
       this.targetTodo = this.initTargetTodo();
       axios.delete(`http://localhost:3000/api/todos/${id}`).then(({ data }) => {
         this.todos = data.todos.reverse(); // このAPIでは配列が入ったオブジェクトが返される（削除済みの）→todos上書き→再描写。

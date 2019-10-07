@@ -9,10 +9,12 @@
         :value="todoTitle"
         @keyup="$emit('update:todoTitle', $event.target.value)"
       >
-      <!--
-        :value="props名" => propsでvalueをバインド
-        this.$emit('update:props名', propsに指定したい値) => 親に伝えるイベントの発火
-      -->
+<!--
+  @keyup → v-on:keyupイベント。　keyupイベントは、フォームまたはコントロールにフォーカスがある状態で、キーボードのキーを離したときに発生。
+  :value="props名" => propsでvalueをバインド。ここで親のプロパティと紐づけされている。
+  targetTodo.title側の変更も反映される。→ showEditorの流れを参照。
+  this.$emit('update:props名(プロパティ名)', propsに指定したい値) => 親に伝えるイベントの発火
+-->
     </div>
     <div class="register__input">
       <p class="register__input__title">やることの内容</p>
@@ -31,6 +33,7 @@
         name="addButton"
         @click="(todoId === null) ? $emit('addTodo') : $emit('editTodo')"
       >
+      <!-- todo-id="targetTodo.id"!  既存か新規かで処理及び表示分け -->
         <template v-if="todoId === null">
           <span>登録する</span>
         </template>

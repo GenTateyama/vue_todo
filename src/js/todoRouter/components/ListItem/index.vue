@@ -1,3 +1,4 @@
+<!-- listからtodoの情報を受け取り、todoの見た目を作る。listで定義したカスタムイベントをイベントと紐づけた$emitで発火させる。 -->
 <template lang="html">
   <li :class="['todo__item', todoCompleted ? 'is-completed' : '']">
     <div class="todo__item__inner">
@@ -40,9 +41,9 @@
 </template>
 
 <script>
-export default {
-  props: {
-    todoTitle: {
+export default { // 基本的には同じ名前でないとpropsは受け取れないが、ハイフンつなぎで渡してキャメルケースで受け取ることが可能。
+  props: { // listから受け取ったもの一覧。
+    todoTitle: { // ESlintに引っかからないように、それぞれのpropsの型の指定と、何も渡されなかったときのデフォルトの値を指定。
       type: String,
       default: '',
     },

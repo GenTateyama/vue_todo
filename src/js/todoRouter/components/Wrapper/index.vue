@@ -1,9 +1,10 @@
+<!--骨組みのみを定義している-->
 <template lang="html">
   <div class="wrapper">
     <div class="inner">
       <app-header />
       <main class="main">
-        <slot />
+        <slot /> <!--デフォルトスロット。name未指定のものがすべて入る-->
         <div class="todos">
           <slot name="todos" />
         </div>

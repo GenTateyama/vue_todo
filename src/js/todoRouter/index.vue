@@ -3,8 +3,8 @@
     <div class="page-description">
       <p>Todo with Routing of vue-router</p>
     </div>
-    <router-view />
-  </div>
+    <router-view /> <!-- ルーティング指定ファイル(今回はroutes.js)を表示に反映させるタグ -->
+  </div> <!--ページ遷移させる表示部分は「todosRouter」フォルダの「components」フォルダの「Navi」のコンポーネントに書かれている -->
 </template>
 
 <script>
