@@ -61,7 +61,7 @@ const store = new Vuex.Store({
       state.targetTodo[name] = value;
     },
     getTodos(state, payload) {
-      state.todos = payload.reverse();
+      state.todos = payload.todos.reverse();
     },
     addTodo(state, payload) {
       state.todos.unshift(payload);
@@ -88,7 +88,8 @@ const store = new Vuex.Store({
     },
     getTodos({ commit }) {
       axios.get('http://localhost:3000/api/todos/').then(({ data }) => {
-        commit('getTodos', data.todos);
+        const payload = {todos:data.todos}; // 配列を創る
+        commit('getTodos', payload);
       }).catch((err) => {
         commit('showError', err.response);
       });
@@ -151,7 +152,8 @@ const store = new Vuex.Store({
     },
     deleteTodo({ commit }, todoId) { // 対象todoのidを取得。
       axios.delete(`http://localhost:3000/api/todos/${todoId}`).then(({ data }) => { // 対象todoの削除をリクエスト。dataには新todosが入っている。
-        commit('getTodos', data.todos); // todosを新しいdata.todosに上書きするミューテーション(getTodos)をコミット。
+        const payload = {todos:data.todos}; // 配列を創る
+        commit('getTodos', payload); // todosを新しいdata.todosに上書きするミューテーション(getTodos)をコミット。
         commit('hideError'); // 追加    // 第二引数にdata.todosを記入しないとstateのtodosと紐づかずリアクティブにならない。
       }).catch((err) => {
       });
