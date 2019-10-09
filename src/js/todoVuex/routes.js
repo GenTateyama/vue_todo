@@ -4,7 +4,7 @@ const routes = [
   {
     name: 'allTodos',
     path: '/',
-    component: Todos,
+    component: Todos, // Todosで処理を行う必要がある？
   },
   {
     name: 'completedTodos',

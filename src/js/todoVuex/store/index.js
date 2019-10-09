@@ -1,3 +1,5 @@
+// storeディレクトリのindex.js。storeインスタンスを定義。エクスポート。
+
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
@@ -6,17 +8,17 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
-  state: {
+  state: { // 使用するstate一覧。今回はmapStates/mapActionsで省略せずにそれぞれ呼び出されている。
     todos: [],
-    todoFilter: '',
-    targetTodo: {
+    todoFilter: '', // naviによる切り替えはこの値の更新だけでよい。それに伴って、何が入るかはgettersで選別され、todosに代入される。
+    targetTodo: {   // そのtodoFilterの更新はwatchの$route:を対応させればよい。
       id: null,
       title: '',
       detail: '',
       completed: '',
     },
-    errorMessage: 'エラーが起きました。',
-    emptyMessage: 'やることリストは空です。',
+    errorMessage: '', // デフォルトを空に変更。
+    emptyMessage: '',
   },
   getters: {
     completedTodos: (state) => state.todos.filter((todo) => todo.completed),
@@ -24,17 +26,17 @@ const store = new Vuex.Store({
     completedTodosLength: (state, getters) => getters.completedTodos.length,
     incompleteTodosLength: (state, getters) => getters.incompleteTodos.length,
   },
-  mutations: {
-    setTodoFilter(state, routeName) {
-      state.todoFilter = routeName;
+  mutations: { // mutationの第一引数には必ずstateが入る。第二引数にはactionから受け取った値。（payloadやrouteName）
+    setTodoFilter(state, routeName) { // 第二引数はrouteのname。
+      state.todoFilter = routeName; // createdから始った一連の処理は、stateのtodoFilterを更新して終了。todosのcomputedで変更を監視。
     },
     setEmptyMessage(state, routeName) {
       if (routeName === 'completedTodos') {
-        let emptyMessage = '完了済みのやることリストはありません。';
+        state.emptyMessage = '完了済みのやることリストはありません。';
       } else if (routeName === 'incompleteTodos') {
-        let emptyMessage = '未完了のやることリストはありません。';
+        state.emptyMessage = '未完了のやることリストはありません。';
       } else {
-        let emptyMessage = 'やることリストには何も登録されていません。';
+        state.emptyMessage = 'やることリストには何も登録されていません。';
       }
     },
     initTargetTodo(state) {
@@ -46,11 +48,11 @@ const store = new Vuex.Store({
       };
     },
     hideError(state) {
-      state.errorMessage = 'エラーが起きました。';
+      state.errorMessage = '';
     },
-    showError(state, payload) {
+    showError(state, payload) { // axiosを使うアクション/addTodoアクションからコミットされる
       if (payload) {
-        const errorMessage = payload.data;
+        state.errorMessage = payload.data; // state.～ で紐づけなければならない。
       } else {
         state.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
       }
@@ -74,9 +76,9 @@ const store = new Vuex.Store({
       });
     },
   },
-  actions: {
-    setTodoFilter({ commit }, routeName) {
-      commit('setTodoFilter', routeName);
+  actions: { // dispatchで引数から値を貰い実行される。
+    setTodoFilter({ commit }, routeName) { // 第二引数はdispatchから受け取ったroutのname。
+      commit('setTodoFilter', routeName); // comit(コミットするmutation名 , 任意の渡す値)
     },
     setEmptyMessage({ commit }, routeName) {
       commit('setEmptyMessage', routeName);
@@ -105,23 +107,25 @@ const store = new Vuex.Store({
       });
       axios.post('http://localhost:3000/api/todos/', postTodo).then(({ data }) => {
         commit('addTodo', data);
+        commit('hideError'); // 追加
       }).catch((err) => {
         commit('showError', err.response);
       });
       commit('initTargetTodo');
     },
-    changeCompleted({ commit }, todo) {
+    changeCompleted({ commit }, todo) {　// listItemから対象todoを引数にもらって実行
       const targetTodo = Object.assign({}, todo);
       axios.patch(`http://localhost:3000/api/todos/${targetTodo.id}`, {
         completed: !targetTodo.completed,
       }).then(({ data }) => {
         commit('editTodo', data);
+        commit('hideError'); // 追加
       }).catch((err) => {
         commit('showError', err.response);
       });
       commit('initTargetTodo');
     },
-    showEditor({ commit }, todo) {
+    showEditor({ commit }, todo) { // listItemから対象todoを引数にもらって実行
       commit('showEditor', todo);
     },
     editTodo({ commit, state }) {
@@ -138,16 +142,17 @@ const store = new Vuex.Store({
         detail: state.targetTodo.detail,
       }).then(({ data }) => {
         commit('editTodo', data);
+        commit('hideError'); // 追加
       }).catch((err) => {
         commit('showError', err.response);
       });
       commit('initTargetTodo');
     },
-    deleteTodo({ commit }, todoId) {
-      axios.delete(`http://localhost:3000/api/todos/${todoId}`).then(({ data }) => {
-        // 処理
+    deleteTodo({ commit }, todoId) { // 対象todoのidを取得。
+      axios.delete(`http://localhost:3000/api/todos/${todoId}`).then(({ data }) => { // 対象todoの削除をリクエスト。dataには新todosが入っている。
+        commit('getTodos', data.todos); // todosを新しいdata.todosに上書きするミューテーション(getTodos)をコミット。
+        commit('hideError'); // 追加    // 第二引数にdata.todosを記入しないとstateのtodosと紐づかずリアクティブにならない。
       }).catch((err) => {
-        // 処理
       });
       // 必要があれば処理
     },

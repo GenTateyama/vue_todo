@@ -31,6 +31,7 @@
         <button
           class="todo__item__btn__delete"
           type="button"
+          @click="deleteTodo(todo.id)"
         >
           削除
         </button>
@@ -49,12 +50,15 @@ export default {
       },
     },
   },
-  methods: {
+  methods: { // イベント対象のtodoを引数に入れてアクションの発火
     changeCompleted: function(todo) {
       this.$store.dispatch('changeCompleted', todo);
     },
     showEditor: function(todo) {
       this.$store.dispatch('showEditor', todo);
+    },
+    deleteTodo: function(todoId) {
+      this.$store.dispatch('deleteTodo', todoId);
     },
   },
 };

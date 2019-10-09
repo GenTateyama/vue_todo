@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  computed: {
+  computed: { // 結局はstateの変化に応じて中身を変え、todosファイルに送っている。
     emptyMessage: function() {
       return this.$store.state.emptyMessage;
     },
