@@ -26,7 +26,8 @@ const router = new VueRouter({
 new Vue({
   el: '#app', // バンドル後にpublickのhtmlファイルのどこにvueインスタンスをマウントさせるかを指定
   router, // 上で定義したvueRouterインスタンスを使用する宣言。this.$routerによってVue Routerにアクセス可能となる。
-  store,　　　　　　　　  // 仮想 DOM” は、Vue コンポーネントのツリーで構築された VNode のツリー全体
+          // 仮想 DOM は、Vue コンポーネントのツリーで構築された VNode のツリー全体を指す。
+  store,　// vueインスタンスで使用を宣言。this.$storeが使用可能になる。
   render: h => h(myApp), // 仮想DOMの構築。createElement＝VNode(仮想ノード)
   // render: h => h(myApp), は↓の書き方を短くしたもの
   // render: function (createElement) { // それを描画関数でtemplateレンダリング。

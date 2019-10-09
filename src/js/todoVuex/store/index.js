@@ -18,7 +18,7 @@ const store = new Vuex.Store({
       completed: '',
     },
     errorMessage: '', // デフォルトを空に変更。
-    emptyMessage: '',
+    emptyMessage: '', // 同上
   },
   getters: {
     completedTodos: (state) => state.todos.filter((todo) => todo.completed),
@@ -26,11 +26,11 @@ const store = new Vuex.Store({
     completedTodosLength: (state, getters) => getters.completedTodos.length,
     incompleteTodosLength: (state, getters) => getters.incompleteTodos.length,
   },
-  mutations: { // mutationの第一引数には必ずstateが入る。第二引数にはactionから受け取った値。（payloadやrouteName）
-    setTodoFilter(state, routeName) { // 第二引数はrouteのname。
-      state.todoFilter = routeName; // createdから始った一連の処理は、stateのtodoFilterを更新して終了。todosのcomputedで変更を監視。
+  mutations: { // mutationの第一引数には必ずstateが入る。第二引数（payloadやrouteName）にはactionから受け取った値が入る。
+    setTodoFilter(state, routeName) { // 第二引数＝routeのname。
+      state.todoFilter = routeName; // createdから始った一連の処理は、stateのtodoFilterを更新して終了。そのあとはtodosのcomputedで変更を監視。
     },
-    setEmptyMessage(state, routeName) {
+    setEmptyMessage(state, routeName) { // letからstate.に変更してstate.emptyMessageに紐づけ。
       if (routeName === 'completedTodos') {
         state.emptyMessage = '完了済みのやることリストはありません。';
       } else if (routeName === 'incompleteTodos') {
@@ -107,7 +107,7 @@ const store = new Vuex.Store({
       });
       axios.post('http://localhost:3000/api/todos/', postTodo).then(({ data }) => {
         commit('addTodo', data);
-        commit('hideError'); // 追加
+        commit('hideError'); // 追加。下記のaxiosを使用するアクションごとに記述。
       }).catch((err) => {
         commit('showError', err.response);
       });
@@ -135,6 +135,7 @@ const store = new Vuex.Store({
         && targetTodo.detail === state.targetTodo.detail
       ) {
         commit('initTargetTodo');
+        commit('hideError'); // 追加
         return;
       }
       axios.patch(`http://localhost:3000/api/todos/${state.targetTodo.id}`, {

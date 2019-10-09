@@ -57,7 +57,7 @@ export default {
     showEditor: function(todo) {
       this.$store.dispatch('showEditor', todo);
     },
-    deleteTodo: function(todoId) {
+    deleteTodo: function(todoId) { // action発火命令のメソッド
       this.$store.dispatch('deleteTodo', todoId);
     },
   },
